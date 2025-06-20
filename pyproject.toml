@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "fast-frontend-api"
+version = "0.1.0"
+description = "博客后台管理系统API"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = {extras = ["standard"], version = "^0.115.13"}
+uvicorn = "^0.27.1"
+sqlmodel = "^0.0.16"
+alembic = "^1.13.1"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-dotenv = "^1.0.1"
+python-multipart = "^0.0.20"
+markdown = "^3.5.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api" 
