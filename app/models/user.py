@@ -1,7 +1,11 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel
+
+if TYPE_CHECKING:
+    from app.models.post import Post
+    from app.models.comment import Comment
 
 
 class User(SQLModel, table=True):

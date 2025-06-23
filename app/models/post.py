@@ -1,9 +1,15 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.association import PostTagLink
+
+if TYPE_CHECKING:
+    from app.models.user import User
+    from app.models.category import Category
+    from app.models.tag import Tag
+    from app.models.comment import Comment
 
 
 class Post(SQLModel, table=True):

@@ -1,9 +1,12 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.association import PostTagLink
+
+if TYPE_CHECKING:
+    from app.models.post import Post
 
 
 class Tag(SQLModel, table=True):
