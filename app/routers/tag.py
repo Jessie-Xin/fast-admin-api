@@ -25,13 +25,13 @@ async def get_tags(
 
 
 # 获取标签详情
-@router.get("/{tag_id}", response_model=TagResponse)
+@router.get("/{tagId}", response_model=TagResponse)
 async def get_tag(
-    tag_id: int,
+    tagId: int,
     session: SessionDep
 ):
     """获取标签详情"""
-    tag = session.get(Tag, tag_id)
+    tag = session.get(Tag, tagId)
     if not tag:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -70,15 +70,15 @@ async def create_tag(
 
 
 # 更新标签（需要管理员权限）
-@router.put("/{tag_id}", response_model=TagResponse)
+@router.put("/{tagId}", response_model=TagResponse)
 async def update_tag(
-    tag_id: int,
+    tagId: int,
     tag_data: TagUpdate,
     session: SessionDep,
     current_user: CurrentAdminUser
 ):
     """更新标签"""
-    tag = session.get(Tag, tag_id)
+    tag = session.get(Tag, tagId)
     if not tag:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -105,14 +105,14 @@ async def update_tag(
 
 
 # 删除标签（需要管理员权限）
-@router.delete("/{tag_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{tagId}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_tag(
-    tag_id: int,
+    tagId: int,
     session: SessionDep,
     current_user: CurrentAdminUser
 ):
     """删除标签"""
-    tag = session.get(Tag, tag_id)
+    tag = session.get(Tag, tagId)
     if not tag:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

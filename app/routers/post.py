@@ -22,8 +22,8 @@ async def get_posts(
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
     search: Optional[str] = None,
-    category_id: Optional[int] = None,
-    tag_id: Optional[int] = None,
+    categoryId: Optional[int] = None,
+    tagId: Optional[int] = None,
     published: Optional[bool] = None
 ):
     """获取文章列表"""
@@ -34,12 +34,12 @@ async def get_posts(
         query = query.filter(Post.title.contains(search) | Post.content_markdown.contains(search))
     
     # 按分类筛选
-    if category_id:
-        query = query.filter(Post.category_id == category_id)
+    if categoryId:
+        query = query.filter(Post.category_id == categoryId)
     
     # 按标签筛选
-    if tag_id:
-        query = query.join(Post.tags).filter(Tag.id == tag_id)
+    if tagId:
+        query = query.join(Post.tags).filter(Tag.id == tagId)
     
     # 按发布状态筛选
     if published is not None:
@@ -56,13 +56,13 @@ async def get_posts(
 
 
 # 获取文章详情
-@router.get("/{post_id}", response_model=PostResponse)
+@router.get("/{postId}", response_model=PostResponse)
 async def get_post(
-    post_id: int,
+    postId: int,
     session: SessionDep
 ):
     """获取文章详情"""
-    post = session.get(Post, post_id)
+    post = session.get(Post, postId)
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -113,15 +113,15 @@ async def create_post(
 
 
 # 更新文章（需要作者本人或管理员权限）
-@router.put("/{post_id}", response_model=PostResponse)
+@router.put("/{postId}", response_model=PostResponse)
 async def update_post(
-    post_id: int,
+    postId: int,
     post_data: PostUpdate,
     session: SessionDep,
     current_user: CurrentActiveUser
 ):
     """更新文章"""
-    post = session.get(Post, post_id)
+    post = session.get(Post, postId)
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -184,14 +184,14 @@ async def update_post(
 
 
 # 删除文章（需要作者本人或管理员权限）
-@router.delete("/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{postId}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_post(
-    post_id: int,
+    postId: int,
     session: SessionDep,
     current_user: CurrentActiveUser
 ):
     """删除文章"""
-    post = session.get(Post, post_id)
+    post = session.get(Post, postId)
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

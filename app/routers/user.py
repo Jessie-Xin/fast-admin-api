@@ -82,14 +82,14 @@ async def get_users(
 
 
 # 管理员获取单个用户详情
-@router.get("/{user_id}", response_model=UserResponse)
+@router.get("/{userId}", response_model=UserResponse)
 async def get_user(
-    user_id: int,
+    userId: int,
     session: SessionDep,
     current_user: CurrentAdminUser
 ):
     """管理员获取用户详情"""
-    user = session.get(User, user_id)
+    user = session.get(User, userId)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -100,15 +100,15 @@ async def get_user(
 
 
 # 管理员更新用户信息
-@router.put("/{user_id}", response_model=UserResponse)
+@router.put("/{userId}", response_model=UserResponse)
 async def update_user(
-    user_id: int,
+    userId: int,
     user_data: UserUpdate,
     session: SessionDep,
     current_user: CurrentAdminUser
 ):
     """管理员更新用户信息"""
-    user = session.get(User, user_id)
+    user = session.get(User, userId)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -162,14 +162,14 @@ async def update_user(
 
 
 # 管理员删除用户
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{userId}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
-    user_id: int,
+    userId: int,
     session: SessionDep,
     current_user: CurrentAdminUser
 ):
     """管理员删除用户"""
-    user = session.get(User, user_id)
+    user = session.get(User, userId)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

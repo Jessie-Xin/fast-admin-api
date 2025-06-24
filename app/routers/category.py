@@ -27,13 +27,13 @@ async def get_categories(
 
 
 # 获取分类详情
-@router.get("/{category_id}", response_model=CategoryResponse)
+@router.get("/{categoryId}", response_model=CategoryResponse)
 async def get_category(
-    category_id: int,
+    categoryId: int,
     session: SessionDep
 ):
     """获取分类详情"""
-    category = session.get(Category, category_id)
+    category = session.get(Category, categoryId)
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -72,15 +72,15 @@ async def create_category(
 
 
 # 更新分类（需要管理员权限）
-@router.put("/{category_id}", response_model=CategoryResponse)
+@router.put("/{categoryId}", response_model=CategoryResponse)
 async def update_category(
-    category_id: int,
+    categoryId: int,
     category_data: CategoryUpdate,
     session: SessionDep,
     current_user: CurrentAdminUser
 ):
     """更新分类"""
-    category = session.get(Category, category_id)
+    category = session.get(Category, categoryId)
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -114,14 +114,14 @@ async def update_category(
 
 
 # 删除分类（需要管理员权限）
-@router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{categoryId}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_category(
-    category_id: int,
+    categoryId: int,
     session: SessionDep,
     current_user: CurrentAdminUser
 ):
     """删除分类"""
-    category = session.get(Category, category_id)
+    category = session.get(Category, categoryId)
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

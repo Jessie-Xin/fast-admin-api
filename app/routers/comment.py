@@ -19,14 +19,14 @@ async def get_comments(
     session: SessionDep,
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
-    post_id: int = None
+    postId: int = None
 ):
     """获取评论列表，可按文章ID筛选"""
     query = select(Comment)
     
     # 按文章筛选
-    if post_id:
-        query = query.filter(Comment.post_id == post_id)
+    if postId:
+        query = query.filter(Comment.post_id == postId)
     
     # 查询总数
     total = session.exec(query).count()
@@ -39,13 +39,13 @@ async def get_comments(
 
 
 # 获取评论详情
-@router.get("/{comment_id}", response_model=CommentResponse)
+@router.get("/{commentId}", response_model=CommentResponse)
 async def get_comment(
-    comment_id: int,
+    commentId: int,
     session: SessionDep
 ):
     """获取评论详情"""
-    comment = session.get(Comment, comment_id)
+    comment = session.get(Comment, commentId)
     if not comment:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -86,15 +86,15 @@ async def create_comment(
 
 
 # 更新评论（作者本人或管理员）
-@router.put("/{comment_id}", response_model=CommentResponse)
+@router.put("/{commentId}", response_model=CommentResponse)
 async def update_comment(
-    comment_id: int,
+    commentId: int,
     comment_data: CommentUpdate,
     session: SessionDep,
     current_user: CurrentActiveUser
 ):
     """更新评论"""
-    comment = session.get(Comment, comment_id)
+    comment = session.get(Comment, commentId)
     if not comment:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -122,14 +122,14 @@ async def update_comment(
 
 
 # 删除评论（作者本人或管理员）
-@router.delete("/{comment_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{commentId}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_comment(
-    comment_id: int,
+    commentId: int,
     session: SessionDep,
     current_user: CurrentActiveUser
 ):
     """删除评论"""
-    comment = session.get(Comment, comment_id)
+    comment = session.get(Comment, commentId)
     if not comment:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
