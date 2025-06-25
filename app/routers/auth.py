@@ -65,52 +65,6 @@ async def login_for_access_token(
     }
 
 
-# 用户注册辅助函数
-async def _register_user(user_data: UserCreate, session: Session):
-    # 验证密码复杂度
-    is_valid, error_messages = validate_password(user_data.password)
-    if not is_valid:
-        error_detail = ", ".join(error_messages)
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"密码不符合安全要求: {error_detail}",
-        )
-
-    # 检查用户名是否存在
-    db_user = session.exec(
-        select(User).where(User.username == user_data.username)
-    ).first()
-    if db_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="用户名已存在",
-        )
-
-    # 检查邮箱是否存在
-    db_email = session.exec(select(User).where(User.email == user_data.email)).first()
-    if db_email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="邮箱已存在",
-        )
-
-    # 创建新用户
-    hashed_password = get_password_hash(user_data.password)
-
-    new_user = User(
-        username=user_data.username,
-        email=user_data.email,
-        hashed_password=hashed_password,
-        is_active=user_data.is_active,
-        is_admin=user_data.is_admin,
-    )
-
-    session.add(new_user)
-    session.commit()
-    session.refresh(new_user)
-
-    return new_user
-
 
 # 注册用户
 @router.post("/register", response_model=UserResponse)

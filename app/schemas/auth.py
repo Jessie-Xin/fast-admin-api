@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class Token(BaseModel):
@@ -25,13 +25,15 @@ class LoginRequest(BaseModel):
     username: str = Field(..., min_length=1, description="用户名或邮箱")
     password: str = Field(..., min_length=1, description="密码")
 
-    @validator("username")
+    @field_validator("username")
+    @classmethod
     def username_not_empty(cls, v):
         if not v or not v.strip():
             raise ValueError("用户名不能为空")
         return v
 
-    @validator("password")
+    @field_validator("password")
+    @classmethod
     def password_not_empty(cls, v):
         if not v or not v.strip():
             raise ValueError("密码不能为空")
