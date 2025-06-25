@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 import logging
 from sqlmodel import Session, select, func
 from app.models.user import User
@@ -64,7 +64,7 @@ def update_user_service(user: User, user_data: UserUpdate):
         user.is_active = user_data.is_active
     if hasattr(user_data, 'is_admin') and user_data.is_admin is not None:
         user.is_admin = user_data.is_admin
-    user.updated_at = datetime.utcnow()
+    user.updated_at = datetime.now(UTC)
     return user
 
 # 删除用户业务逻辑

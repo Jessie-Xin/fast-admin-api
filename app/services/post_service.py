@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional
 import logging
 
@@ -109,7 +109,7 @@ def update_post_service(post: Post, post_data: PostUpdate, session: Session):
         post.published = post_data.published
     if post_data.category_id is not None:
         post.category_id = post_data.category_id
-    post.updated_at = datetime.utcnow()
+    post.updated_at = datetime.now(UTC)
     session.add(post)
     session.commit()
     if post_data.tag_ids is not None:

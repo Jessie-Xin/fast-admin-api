@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from typing import Optional
 from jose import jwt, JWTError
 from sqlmodel import Session, select
@@ -11,6 +11,7 @@ from app.core.validators import validate_password
 from app.models.user import User
 from app.schemas.auth import PasswordChange, PasswordReset, PasswordResetRequest
 from app.schemas.user import UserCreate
+from app.services.email_service import send_email
 
 logger = logging.getLogger(__name__)
 
@@ -61,13 +62,20 @@ def password_reset_request_service(reset_request: PasswordResetRequest, session:
     if not user:
         return {"message": "如果该邮箱存在，密码重置链接已发送"}
     reset_token = generate_reset_token()
-    token_expires = datetime.utcnow() + timedelta(hours=24)
+    token_expires = datetime.now(UTC) + timedelta(hours=24)
     user.reset_token = reset_token
     user.reset_token_expires = token_expires
     session.add(user)
     session.commit()
     reset_url = f"{settings.FRONTEND_URL}/reset-password?token={reset_token}"
     logger.info(f"生成密码重置链接: {reset_url}")
+    # 发送邮件
+    send_email(
+        to_email=user.email,
+        subject="密码重置请求",
+        body=f"您好，\n\n请点击以下链接重置您的密码：\n{reset_url}\n\n如果不是您本人操作，请忽略此邮件。",
+        html=False
+    )
     return {"message": "密码重置链接已发送到您的邮箱", "reset_url": reset_url, "token": reset_token}
 
 # 密码重置业务逻辑
@@ -76,7 +84,7 @@ def reset_password_service(reset_data: PasswordReset, session: Session):
     user = session.exec(select(User).where(User.reset_token == reset_data.token)).first()
     if not user:
         raise ValueError("无效的重置令牌")
-    if user.reset_token_expires is None or user.reset_token_expires < datetime.utcnow():
+    if user.reset_token_expires is None or user.reset_token_expires < datetime.now(UTC):
         raise ValueError("重置令牌已过期")
     is_valid, error_messages = validate_password(reset_data.new_password)
     if not is_valid:

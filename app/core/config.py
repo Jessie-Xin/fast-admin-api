@@ -25,9 +25,19 @@ class Settings(BaseSettings):
     # 前端地址配置
     FRONTEND_URL: str = "http://localhost:3000"
 
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+    # 邮箱配置
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 465
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_TLS: bool = True
+    EMAIL_FROM: str = ""
+    EMAIL_FROM_NAME: str = "FastAdmin"
+
+    model_config = {
+        "env_file": ".env",
+        "extra": "allow"
+    }
 
 
 # 创建全局设置实例

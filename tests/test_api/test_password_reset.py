@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 
 from fastapi import status
 from sqlmodel import select
@@ -25,7 +25,7 @@ def test_request_password_reset_existing_user(client, test_user, session):
     updated_user = session.exec(select(User).where(User.id == test_user.id)).first()
     assert updated_user.reset_token is not None
     assert updated_user.reset_token_expires is not None
-    assert updated_user.reset_token_expires > datetime.utcnow()
+    assert updated_user.reset_token_expires > datetime.now(UTC)
 
 
 def test_request_password_reset_nonexistent_user(client):
@@ -47,7 +47,7 @@ def test_reset_password_valid_token(client, test_user, session):
     # 准备测试数据
     reset_token = generate_reset_token()
     test_user.reset_token = reset_token
-    test_user.reset_token_expires = datetime.utcnow() + timedelta(hours=1)
+    test_user.reset_token_expires = datetime.now(UTC) + timedelta(hours=1)
     session.add(test_user)
     session.commit()
 
@@ -79,7 +79,7 @@ def test_reset_password_expired_token(client, test_user, session):
     # 准备测试数据
     reset_token = generate_reset_token()
     test_user.reset_token = reset_token
-    test_user.reset_token_expires = datetime.utcnow() - timedelta(hours=1)  # 过期的令牌
+    test_user.reset_token_expires = datetime.now(UTC) - timedelta(hours=1)  # 过期的令牌
     session.add(test_user)
     session.commit()
 
@@ -112,7 +112,7 @@ def test_reset_password_weak_password(client, test_user, session):
     # 准备测试数据
     reset_token = generate_reset_token()
     test_user.reset_token = reset_token
-    test_user.reset_token_expires = datetime.utcnow() + timedelta(hours=1)
+    test_user.reset_token_expires = datetime.now(UTC) + timedelta(hours=1)
     session.add(test_user)
     session.commit()
 

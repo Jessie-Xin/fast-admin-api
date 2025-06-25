@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 import logging
 
 from fastapi import APIRouter, Query, status, HTTPException
@@ -55,7 +55,7 @@ async def update_user_me(
         current_user.hashed_password = get_password_hash(user_data.password)
 
     # 更新时间
-    current_user.updated_at = datetime.utcnow()
+    current_user.updated_at = datetime.now(UTC)
 
     updated_user = update_user_service(current_user, user_data)
     session.add(updated_user)
@@ -150,7 +150,7 @@ async def update_user(
         user.is_admin = user_data.is_admin
 
     # 更新时间
-    user.updated_at = datetime.utcnow()
+    user.updated_at = datetime.now(UTC)
 
     updated_user = update_user_service(user, user_data)
     session.add(updated_user)

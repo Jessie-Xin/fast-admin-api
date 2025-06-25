@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 import logging
 from sqlmodel import Session, select, func
 from app.models.category import Category
@@ -53,7 +53,7 @@ def update_category_service(category: Category, category_data: CategoryUpdate, s
         category.name = category_data.name
     if category_data.description is not None:
         category.description = category_data.description
-    category.updated_at = datetime.utcnow()
+    category.updated_at = datetime.now(UTC)
     session.add(category)
     session.commit()
     session.refresh(category)

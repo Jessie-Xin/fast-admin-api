@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 import logging
 from sqlmodel import Session, select, func
 from app.models.comment import Comment
@@ -60,7 +60,7 @@ def create_comment_service(comment_data: CommentCreate, session: Session, user_i
 def update_comment_service(comment: Comment, comment_data: CommentUpdate, session: Session):
     """更新评论业务逻辑"""
     comment.content = comment_data.content
-    comment.updated_at = datetime.utcnow()
+    comment.updated_at = datetime.now(UTC)
     session.add(comment)
     session.commit()
     session.refresh(comment)
