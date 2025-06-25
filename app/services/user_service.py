@@ -1,15 +1,37 @@
 from datetime import datetime
-from sqlmodel import Session, select
+import logging
+from sqlmodel import Session, select, func
 from app.models.user import User
 from app.schemas.user import UserUpdate
 from app.core.security import get_password_hash
 
+# 设置日志
+logger = logging.getLogger(__name__)
+
 # 获取用户列表业务逻辑
 def get_users_service(session: Session, skip: int = 0, limit: int = 100):
     """获取用户列表业务逻辑"""
-    users = session.exec(select(User).offset(skip).limit(limit)).all()
-    total = session.exec(select(User)).count()
-    return total, users
+    try:
+        # 获取分页用户列表
+        users_query = select(User).offset(skip).limit(limit)
+        logger.info(f"用户查询: {users_query}")
+        users = session.exec(users_query).all()
+        logger.info(f"获取到用户列表: {len(users)} 条记录")
+        
+        # 获取用户总数
+        total_query = select(func.count(User.id))
+        logger.info(f"总数查询: {total_query}")
+        total_result = session.exec(total_query).first()
+        logger.info(f"获取到用户总数结果: {total_result}, 类型: {type(total_result)}")
+        
+        # 确保total是整数
+        total = int(total_result) if total_result is not None else 0
+        logger.info(f"最终用户总数: {total}")
+        
+        return total, users
+    except Exception as e:
+        logger.error(f"获取用户列表错误: {str(e)}", exc_info=True)
+        raise
 
 # 获取单个用户详情业务逻辑
 def get_user_service(userId: int, session: Session):

@@ -1,14 +1,30 @@
 from datetime import datetime
-from sqlmodel import Session, select
+import logging
+from sqlmodel import Session, select, func
 from app.models.category import Category
 from app.schemas.category import CategoryCreate, CategoryUpdate
+
+# 设置日志
+logger = logging.getLogger(__name__)
 
 # 获取分类列表业务逻辑
 def get_categories_service(session: Session, skip: int = 0, limit: int = 100):
     """获取分类列表业务逻辑"""
-    categories = session.exec(select(Category).offset(skip).limit(limit)).all()
-    total = len(session.exec(select(Category)).all())
-    return total, categories
+    try:
+        # 获取分页数据
+        categories_query = select(Category).offset(skip).limit(limit)
+        categories = session.exec(categories_query).all()
+        
+        # 获取总数
+        count_query = select(func.count(Category.id))
+        total_result = session.exec(count_query).first()
+        total = int(total_result) if total_result is not None else 0
+        
+        logger.info(f"获取分类列表: 总数={total}, 返回={len(categories)}")
+        return total, categories
+    except Exception as e:
+        logger.error(f"获取分类列表错误: {str(e)}", exc_info=True)
+        raise
 
 # 获取分类详情业务逻辑
 def get_category_service(categoryId: int, session: Session):

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query, status
+import logging
 
 from app.core.dependencies import (CurrentAdminUser,
                                    SessionDep)
@@ -12,6 +13,9 @@ from app.services.tag_service import (
     delete_tag_service,
 )
 
+# 设置日志
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/api/tags", tags=["tags"])
 
 
@@ -23,8 +27,21 @@ async def get_tags(
     limit: int = Query(100, ge=1, le=100),
 ):
     """获取标签列表"""
-    total, tags = get_tags_service(session, skip, limit)
-    return TagListResponse(total=total, tags=tags)
+    try:
+        # 获取标签列表和总数
+        total, tags = get_tags_service(session, skip, limit)
+        logger.info(f"获取标签列表: 总数={total}, 返回={len(tags)}")
+        
+        # 将SQLModel对象转换为Pydantic响应模型
+        formatted_tags = [TagResponse.model_validate(tag, from_attributes=True) for tag in tags]
+        logger.info(f"格式化后的标签列表长度: {len(formatted_tags)}")
+        
+        # 构建并返回响应
+        response = TagListResponse(total=total, tags=formatted_tags)
+        return response
+    except Exception as e:
+        logger.error(f"获取标签列表出错: {str(e)}", exc_info=True)
+        raise
 
 
 # 获取标签详情

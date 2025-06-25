@@ -1,6 +1,7 @@
 from datetime import datetime
+import logging
 
-from fastapi import APIRouter, Query, status
+from fastapi import APIRouter, Query, status, HTTPException
 
 from app.core.dependencies import (CurrentActiveUser, CurrentAdminUser,
                                    CurrentUser, SessionDep)
@@ -13,6 +14,9 @@ from app.services.user_service import (
     update_user_service,
     delete_user_service,
 )
+
+# 设置日志
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 
@@ -70,8 +74,27 @@ async def get_users(
     limit: int = Query(100, ge=1, le=100),
 ):
     """管理员获取用户列表"""
-    total, users = get_users_service(session, skip, limit)
-    return UserListResponse(total=total, users=users)
+    # 日志记录
+    logger.info(f"获取用户列表请求: skip={skip}, limit={limit}, 当前用户={current_user.id}")
+    
+    try:
+        # 获取用户列表和总数
+        total, users = get_users_service(session, skip, limit)
+        logger.info(f"获取到用户列表: {len(users)}条记录, 总数={total}, 类型={type(total)}")
+        
+        # 确保total是整数
+        total_count = int(total) if total is not None else 0
+        
+        # 确保用户列表正确格式化
+        formatted_users = [UserResponse.model_validate(u, from_attributes=True) for u in users]
+        
+        # 构建并返回响应
+        response = UserListResponse(total=total_count, users=formatted_users)
+        logger.info(f"返回响应: 总数={response.total}, 用户列表长度={len(response.users)}")
+        return response
+    except Exception as e:
+        logger.error(f"获取用户列表出错: {str(e)}", exc_info=True)
+        raise
 
 
 # 管理员获取单个用户详情

@@ -1,5 +1,5 @@
-
 from fastapi import APIRouter, HTTPException, Query, status
+import logging
 
 from app.core.dependencies import (CurrentAdminUser,
                                    SessionDep)
@@ -14,6 +14,9 @@ from app.services.category_service import (
     delete_category_service,
 )
 
+# 设置日志
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/api/categories", tags=["categories"])
 
 
@@ -25,8 +28,21 @@ async def get_categories(
     limit: int = Query(100, ge=1, le=100),
 ):
     """获取分类列表"""
-    total, categories = get_categories_service(session, skip, limit)
-    return CategoryListResponse(total=total, categories=categories)
+    try:
+        # 获取分类列表和总数
+        total, categories = get_categories_service(session, skip, limit)
+        logger.info(f"获取分类列表: 总数={total}, 返回={len(categories)}")
+        
+        # 将SQLModel对象转换为Pydantic响应模型
+        formatted_categories = [CategoryResponse.model_validate(category, from_attributes=True) for category in categories]
+        logger.info(f"格式化后的分类列表长度: {len(formatted_categories)}")
+        
+        # 构建并返回响应
+        response = CategoryListResponse(total=total, categories=formatted_categories)
+        return response
+    except Exception as e:
+        logger.error(f"获取分类列表出错: {str(e)}", exc_info=True)
+        raise
 
 
 # 获取分类详情

@@ -1,11 +1,12 @@
 from typing import Optional
+import logging
 
 from fastapi import APIRouter, HTTPException, Query, status
 
 from app.core.dependencies import (CurrentActiveUser, SessionDep)
 from app.models.post import Post
 from app.schemas.post import (PostCreate, PostListResponse, PostResponse,
-                              PostUpdate)
+                              PostUpdate, PostBrief)
 from app.services.post_service import (
     get_posts_service,
     get_post_service,
@@ -13,6 +14,9 @@ from app.services.post_service import (
     update_post_service,
     delete_post_service,
 )
+
+# 设置日志
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/posts", tags=["posts"])
 
@@ -29,16 +33,29 @@ async def get_posts(
     published: Optional[bool] = None,
 ):
     """获取文章列表"""
-    total, posts = get_posts_service(
-        session=session,
-        skip=skip,
-        limit=limit,
-        search=search,
-        categoryId=categoryId,
-        tagId=tagId,
-        published=published,
-    )
-    return PostListResponse(total=total, posts=posts)
+    try:
+        # 获取文章列表和总数
+        total, posts = get_posts_service(
+            session=session,
+            skip=skip,
+            limit=limit,
+            search=search,
+            categoryId=categoryId,
+            tagId=tagId,
+            published=published,
+        )
+        logger.info(f"获取文章列表: 总数={total}, 返回={len(posts)}")
+        
+        # 将SQLModel对象转换为Pydantic响应模型
+        formatted_posts = [PostBrief.model_validate(post, from_attributes=True) for post in posts]
+        logger.info(f"格式化后的文章列表长度: {len(formatted_posts)}")
+        
+        # 构建并返回响应
+        response = PostListResponse(total=total, posts=formatted_posts)
+        return response
+    except Exception as e:
+        logger.error(f"获取文章列表出错: {str(e)}", exc_info=True)
+        raise
 
 
 # 获取文章详情

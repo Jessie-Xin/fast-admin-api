@@ -1,5 +1,5 @@
-
 from fastapi import APIRouter, HTTPException, Query, status
+import logging
 
 from app.core.dependencies import (CurrentActiveUser, SessionDep)
 from app.schemas.comment import (CommentCreate, CommentListResponse,
@@ -11,6 +11,9 @@ from app.services.comment_service import (
     update_comment_service,
     delete_comment_service,
 )
+
+# 设置日志
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/comments", tags=["comments"])
 
@@ -24,8 +27,21 @@ async def get_comments(
     postId: int = None,
 ):
     """获取评论列表，可按文章ID筛选"""
-    total, comments = get_comments_service(session, skip, limit, postId)
-    return CommentListResponse(total=total, comments=comments)
+    try:
+        # 获取评论列表和总数
+        total, comments = get_comments_service(session, skip, limit, postId)
+        logger.info(f"获取评论列表: 总数={total}, 返回={len(comments)}")
+        
+        # 将SQLModel对象转换为Pydantic响应模型
+        formatted_comments = [CommentResponse.model_validate(comment, from_attributes=True) for comment in comments]
+        logger.info(f"格式化后的评论列表长度: {len(formatted_comments)}")
+        
+        # 构建并返回响应
+        response = CommentListResponse(total=total, comments=formatted_comments)
+        return response
+    except Exception as e:
+        logger.error(f"获取评论列表出错: {str(e)}", exc_info=True)
+        raise
 
 
 # 获取评论详情

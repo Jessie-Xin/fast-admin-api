@@ -1,13 +1,29 @@
-from sqlmodel import Session, select
+import logging
+from sqlmodel import Session, select, func
 from app.models.tag import Tag
 from app.schemas.tag import TagCreate, TagUpdate
+
+# 设置日志
+logger = logging.getLogger(__name__)
 
 # 获取标签列表业务逻辑
 def get_tags_service(session: Session, skip: int = 0, limit: int = 100):
     """获取标签列表业务逻辑"""
-    tags = session.exec(select(Tag).offset(skip).limit(limit)).all()
-    total = len(session.exec(select(Tag)).all())
-    return total, tags
+    try:
+        # 获取分页数据
+        tags_query = select(Tag).offset(skip).limit(limit)
+        tags = session.exec(tags_query).all()
+        
+        # 获取总数
+        count_query = select(func.count(Tag.id))
+        total_result = session.exec(count_query).first()
+        total = int(total_result) if total_result is not None else 0
+        
+        logger.info(f"获取标签列表: 总数={total}, 返回={len(tags)}")
+        return total, tags
+    except Exception as e:
+        logger.error(f"获取标签列表错误: {str(e)}", exc_info=True)
+        raise
 
 # 获取标签详情业务逻辑
 def get_tag_service(tagId: int, session: Session):
