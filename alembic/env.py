@@ -2,16 +2,17 @@ import sys
 from logging.config import fileConfig
 from os.path import abspath, dirname
 
-from alembic import context
 from sqlalchemy import engine_from_config, pool
 from sqlmodel import SQLModel
+
+from alembic import context
 
 # 将项目根目录添加到Python路径
 sys.path.append(dirname(dirname(abspath(__file__))))
 
+from app.core.config import settings  # noqa
 # 导入所有模型
 from app.models import *  # noqa
-from app.core.config import settings  # noqa
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -78,7 +79,7 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, 
+            connection=connection,
             target_metadata=target_metadata,
             render_as_batch=True,  # 支持SQLite ALTER
         )
@@ -90,4 +91,4 @@ def run_migrations_online() -> None:
 if context.is_offline_mode():
     run_migrations_offline()
 else:
-    run_migrations_online() 
+    run_migrations_online()

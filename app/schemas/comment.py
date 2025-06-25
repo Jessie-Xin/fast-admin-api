@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List
 
 from pydantic import BaseModel, Field
 
@@ -33,4 +33,4 @@ class CommentListResponse(BaseModel):
 
 # 评论更新请求模型
 class CommentUpdate(BaseModel):
-    content: str = Field(..., min_length=1) 
+    content: str = Field(..., min_length=1)

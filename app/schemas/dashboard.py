@@ -14,4 +14,4 @@ class DashboardSummary(BaseModel):
     total_comments: int
     total_users: int
     recent_posts: List[PostBrief]
-    recent_comments: List[CommentResponse] 
+    recent_comments: List[CommentResponse]

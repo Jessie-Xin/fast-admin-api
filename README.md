@@ -2,6 +2,9 @@
 
 使用FastAPI、SQLModel、SQLite、Poetry和OAuth2实现的博客后台管理系统API。
 
+## 项目简介
+本项目为 FastAPI + SQLModel 的博客后台 API，支持用户、文章、评论、标签等管理。
+
 ## 技术栈
 
 - Python 3.12
@@ -115,5 +118,19 @@ poetry run alembic upgrade head
 
 # 回滚一个版本
 poetry run alembic downgrade -1
-``` 
+```
+
+## 快速开始
+```bash
+poetry install
+poetry run python main.py
+```
+
+## 代码规范
+- 统一使用 black、isort、flake8 进行格式化和规范检查
+- 业务逻辑与 API 路由分层
+
+## 常见问题
+- 缺少依赖请运行 poetry install
+- 数据库迁移请参考 alembic 文档 
  

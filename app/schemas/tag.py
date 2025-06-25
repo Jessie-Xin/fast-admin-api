@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List
 
 from pydantic import BaseModel, Field
 
@@ -28,4 +28,4 @@ class TagListResponse(BaseModel):
 
 # 标签更新请求模型
 class TagUpdate(BaseModel):
-    name: str = Field(..., min_length=1, max_length=30) 
+    name: str = Field(..., min_length=1, max_length=30)

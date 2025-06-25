@@ -31,4 +31,4 @@ class CategoryListResponse(BaseModel):
 # 分类更新请求模型
 class CategoryUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=2, max_length=50)
-    description: Optional[str] = None 
+    description: Optional[str] = None

@@ -57,4 +57,4 @@ class PostUpdate(BaseModel):
     summary: Optional[str] = None
     published: Optional[bool] = None
     category_id: Optional[int] = None
-    tag_ids: Optional[List[int]] = None 
+    tag_ids: Optional[List[int]] = None
